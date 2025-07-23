@@ -38,6 +38,7 @@ const expressService = {
       });
 
       server.use(globalErrorHandler);
+      server.timeout = 120000;
 
       server.listen(process.env.SERVER_PORT, () => {
         console.log(
@@ -47,7 +48,6 @@ const expressService = {
       });
     } catch (error) {
       console.log("[EXPRESS] Error during express service initialization");
-      throw error;
     }
   },
 };

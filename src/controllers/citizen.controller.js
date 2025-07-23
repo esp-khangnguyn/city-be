@@ -48,6 +48,7 @@ let citizenController = {
   getAll: async (req, res, next) => {
     try {
       const { page = 1, limit = 10, ...filters } = req.query;
+      console.log("🚀 ~ filters:", filters);
 
       const offset = (page - 1) * limit;
       const whereCondition = {};
@@ -75,9 +76,18 @@ let citizenController = {
         };
       }
 
+      if (filters.first_name) {
+        whereCondition.first = { [Op.iLike]: `%${filters.first_name}%` };
+      }
+      if (filters.last_name) {
+        whereCondition.last = { [Op.iLike]: `%${filters.last_name}%` };
+      }
+
       // Add specific filters if provided (these work in combination with general search)
       if (filters.national_identifier) {
-        whereCondition.national_identifier = filters.national_identifier;
+        whereCondition.national_identifier = {
+          [Op.iLike]: `%${filters.national_identifier}%`,
+        };
       }
 
       // Location filters
@@ -146,11 +156,11 @@ let citizenController = {
           ["last", "ASC"],
         ],
       });
+      console.log("🚀 ~ rows:", rows);
 
-      console.log("🚀 ~ getAll: ~ whereCondition:", whereCondition);
-      const count = await Citizen.count({
-        where: whereCondition,
-      });
+      // const count = await Citizen.count({
+      //   where: whereCondition,
+      // });
 
       // const count = await Citizen.count({
       //   where: {
@@ -166,14 +176,15 @@ let citizenController = {
       //   },
       // });
       const test = rows.map((citizen) => citizen.get({ plain: true }));
+      console.log("🚀 ~ test:", test);
 
       const data = {
         citizens: test,
         pagination: {
-          total: count,
+          total: 10,
           page: parseInt(page),
           limit: parseInt(limit),
-          totalPages: Math.ceil(count / limit),
+          totalPages: Math.ceil(10 / limit),
         },
       };
       return res.status(200).json(data);
