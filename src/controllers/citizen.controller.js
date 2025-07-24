@@ -86,7 +86,7 @@ let citizenController = {
       // Add specific filters if provided (these work in combination with general search)
       if (filters.national_identifier) {
         whereCondition.national_identifier = {
-          [Op.iLike]: `%${filters.national_identifier}%`,
+          [Op.iLike]: `%${filters.national_identifier.trim()}%`,
         };
       }
 
